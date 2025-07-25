@@ -1,8 +1,11 @@
 #!/bin/sh
-
+set -x
 #HOMEnos=/lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.6.0
-cd ../..
-HOMEnos=`pwd`
+#cd ../..
+#HOMEnos=`pwd`
+
+export HOMEnos=$(dirname $(dirname $PWD))
+echo $HOMEnos
 
 BUILD_VERSION_FILE=$HOMEnos/versions/build.ver
 if [ -f $BUILD_VERSION_FILE ]; then
@@ -12,47 +15,22 @@ else
    exit
 fi
 export HOMEnos=${HOMEnos:-${PACKAGEROOT:?}/nosofs.${nosofs_ver:?}}
-export COMP_F=ftn
-export COMP_F_MPI90=ftn
-export COMP_F_MPI=ftn
-export COMP_ICC=cc
-export COMP_CC=cc
-export COMP_CPP=cpp
-export COMP_MPCC=cc
 
-module purge
-printenv SHELL
-module purge
-module load envvar/$envvars_ver
-# Loading Intel Compiler Suite
-module load PrgEnv-intel/${PrgEnv_intel_ver}
-module load craype/${craype_ver}
-module load intel/${intel_ver}
-module load cray-mpich/${cray_mpich_ver}
-module load cray-pals/${cray_pals_ver}
+# TODO: get envvar module from wcoss-2 and/or other systems
+# TODO: if envvars isn't working within a module, try loading it as a prerequisite in the platform modulefile
+#module load envvar/$envvars_ver
 
-#Set other library variables
-module load metis/${metis_ver}
-#module load netcdf/${netcdf_ver}
-#module load hdf5/${hdf5_ver}
-module load bacio/${bacio_ver}
-module load w3nco/${w3nco_ver}
-module load w3emc/${w3emc_ver}
-module load g2/${g2_ver}
-module load zlib/${zlib_ver}
-module load libpng/${libpng_ver}
-module load bufr/${bufr_ver}
-module load jasper/${jasper_ver}
-#
-#Set other library variables
-module load netcdf/${netcdf_ver}
-module load hdf5/${hdf5_ver}
-module load subversion/${subversion_ver}
-module load petsc/${petsc_ver}
+set +x
+module use -a $HOMEnos/modulefiles
+#module load wcoss2_prod
+module load ioos-sb.intel_x86_64
+set -x
 
 export SORCnos=$HOMEnos/sorc
 export EXECnos=$HOMEnos/exec
 export LIBnos=$HOMEnos/lib
+
+FVCOM_source=FVCOM_source.prod
 
 if [ ! -s $EXECnos ]
 then
@@ -66,49 +44,81 @@ then
 fi
 set -x
 
-#cd  $SORCnos/FVCOM.fd/FVCOM_source/libs/julian
-#gmake clean
-#gmake -f makefile
-
-#if [ -s libjulian.a ]; then
-#  cp -p libjulian.a $LIBnos
-#else
-#  echo "WARNING: libjulian.a was not created"
-#fi
-#rm -f *.o
-#cd  $SORCnos/FVCOM.fd/FVCOM_source/libs/proj.4-master
-#gmake clean
-#./configure CC=cc FC=ftn CFLAGS='-DIFORT -g -w -O2' --prefix=$SORCnos/FVCOM.fd/FVCOM_source/libs/proj.4-master
-#gmake
-#gmake install
-#if [ -s ./lib64/libproj.a ]; then
-#  cp -p ./lib64/libproj.* $LIBnos
-#else
-# echo "WARNING: ./lib64/libproj.a was not created"
-#fi
-
-#cd $SORCnos/FVCOM.fd/FVCOM_source/libs/proj4-fortran-master
-#gmake clean
-#./configure  CC=cc FC=ftn CFLAGS='-DIFORT -g -w -O2' proj4=$SORCnos/FVCOM.fd/FVCOM_source/libs/proj.4-master --prefix=$SORCnos/FVCOM.fd/FVCOM_source/libs/proj4-fortran-master
-#gmake
-#gmake install
-#if [ -s ./lib64/libfproj4.a ]; then
-#  cp -p ./lib64/libfproj4.a $LIBnos
-#else
-#  echo "WARNING: ./lib/libfproj4.a was not created"
-#fi
-
-cd $SORCnos/FVCOM.fd/FVCOM_source
-
+cd $SORCnos/FVCOM.fd/$FVCOM_source/libs/julian
 gmake clean
-gmake -f makefile_necofs
-if [ -s  fvcom_necofs ]; then
-	  mv fvcom_necofs $EXECnos/.
+gmake -f makefile
+
+if [ -s libjulian.a ]; then
+  cp -p libjulian.a $LIBnos
+else
+  echo "WARNING: libjulian.a was not created"
+fi
+rm -f *.o
+
+# Proj4 needs to be unzipped before building proj4.zip
+#BUILD_PROJ4="YES"
+
+BUILD_PROJ4="NO"
+
+if [[ $BUILD_PROJ4 == "YES" ]]; then
+  cd $SORCnos/FVCOM.fd/$FVCOM_source/libs
+  unzip -n proj4.zip
+
+  cd  $SORCnos/FVCOM.fd/$FVCOM_source/libs/proj.4-master
+  gmake clean
+  ./configure CC=$COMP_CC FC=$COMP_F CFLAGS='-DIFORT -g -w -O2'       \
+          --prefix=$SORCnos/FVCOM.fd/$FVCOM_source/libs/proj.4-master
+  gmake
+  gmake install
+  if [ -s ./lib64/libproj.a ]; then
+    cp -p ./lib64/libproj.* $LIBnos
   else
-	    echo 'necofs fvcom executable is not created'
+    echo "WARNING: ./lib64/libproj.a was not created"
+  fi
+
+  cd $SORCnos/FVCOM.fd/$FVCOM_source/libs/proj4-fortran-master
+  gmake clean
+  ./configure CC=$COMP_CC FC=$COMP_F CFLAGS='-DIFORT -g -w -O2'           \
+        proj4=$SORCnos/FVCOM.fd/$FVCOM_source/libs/proj.4-master          \
+        --prefix=$SORCnos/FVCOM.fd/$FVCOM_source/libs/proj4-fortran-master
+  gmake
+  gmake install
+  if [ -s ./lib64/libfproj4.a ]; then
+    cp -p ./lib64/libfproj4.a $LIBnos
+  else
+    echo "WARNING: ./lib/libfproj4.a was not created"
+  fi
 fi
 
+cd $SORCnos/FVCOM.fd/$FVCOM_source
+
+models='leofs lmhofs loofs lsofs ngofs2 sfbofs sscofs'
+# models='necofs'
+models='sfbofs'
+
+for model in $models
+do
+  gmake clean
+  # model^^ is upper-case model
+  gmake -f makefile_${model^^}
+  if [ -s  fvcom_${model} ]; then
+    mv fvcom_${model} $EXECnos/.
+  else
+    echo 'fvcom executable is not created'
+  fi
+done
+
 exit
+
+#gmake clean
+#gmake -f makefile_necofs
+#if [ -s  fvcom_necofs ]; then
+#  mv fvcom_necofs $EXECnos/.
+#else
+#  echo 'necofs fvcom executable is not created'
+#fi
+
+#exit
 
 gmake clean
 gmake -f makefile_NGOFS2
@@ -158,7 +168,7 @@ else
   echo 'fvcom executable is not created'
 fi
 
-cd $SORCnos/FVCOM.fd/FVCOM_source
+cd $SORCnos/FVCOM.fd/$FVCOM_source
 gmake clean
 gmake -f makefile_SSCOFS
 if [ -s  fvcom_sscofs ]; then
