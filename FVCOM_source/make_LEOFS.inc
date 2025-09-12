@@ -178,8 +178,13 @@ dashL= $(empty) -L
              FLAG_4 = -DMULTIPROCESSOR
 	     FLAG_411 = -DMETIS_5
              PARLIB = 
-             PARTINCS =  
-             PARTLIBS = -lmetis
+             # PARTINCS =  
+             # PARTLIBS =
+             # PARTLIBS = -lmetis
+
+# nos/ioos sandbox
+             PARTINCS = -I$(METIS)/include
+             PARTLIBS = -L$(METIS)/lib -lmetis
 
 # acorn
 #             PARTLIBS     = -L$(NOSLIBS_DIR)/metis-5.1.0/lib -lmetis
@@ -221,8 +226,8 @@ dashL= $(empty) -L
 
 
              FLAG_6     = -DPROJ
-             PLIB1      = -L./libs/proj.4-master/lib64 -lproj -lm
-             PLIB2      = -L./libs/proj4-fortran-master/lib64 -lfproj4 -lm
+             PLIB1      = -L./libs/proj.4-master/lib -lproj -lm
+             PLIB2      = -L./libs/proj4-fortran-master/lib -lfproj4 -lm
              PROJLIBS   = $(PLIB1) $(PLIB2)
 
              PINC1      = -I./libs/proj.4-master/include
@@ -605,20 +610,32 @@ dashL= $(empty) -L
 #--------------------------------------------------------------------------
 #          CPPFLAGS = $(DEF_FLAGS) -DAIX
 #         COMPILER = -DIFORT
-
-        CPPFLAGS = $(DEF_FLAGS)
-	COMPILER =
-        FIXEDFLAGS = -nofree
-	FC       = $(COMP_F_MPI)
-	CC       = $(COMP_MPCC)
-	CPP      = $(COMP_CPP)
-	CXX      = $(COMP_CC)
+#
+#        CPPFLAGS = $(DEF_FLAGS)
+#	COMPILER =
+#        FIXEDFLAGS = -nofree
+#	FC       = $(COMP_F_MPI)
+#	CC       = $(COMP_MPCC)
+#	CPP      = $(COMP_CPP)
+#	CXX      = $(COMP_CC)
 #        DEBFLGS  = -check all -traceback
 #       OPT      = -O3
-        OPT      = -O2 -fp-model precise -ftz -fast-transcendentals -no-prec-div
+#        OPT      = -O2 -fp-model precise -ftz -fast-transcendentals -no-prec-div
 # NGOFS2 has to use strict, "precision"
 #	OPT      = -O3 -fp-model strict -ftz -fast-transcendentals -no-prec-div
 #         OPT      = -O3 -fp-model precise  -ftz -fast-transcendentals -no-prec-div -no-prec-sqrt
+
+#--------------------------------------------------------------------------
+#  Intel OneAPI/MPI Compiler Definitions (AWS Cloud Sandbox)
+#--------------------------------------------------------------------------
+          CPPFLAGS = $(DEF_FLAGS)
+          COMPILER = -DIFORT
+          FIXEDFLAGS = -nofree
+          FC       = $(COMP_F_MPI) -fc=ifort
+          CC       = $(COMP_MPCC) -cc=icc
+          CPP      = $(COMP_CPP)
+          CXX      = $(COMP_CC)
+          OPT      = -O3 -fp-model precise -ftz -fast-transcendentals -no-prec-div
 
 #--------------------------------------------------------------------------
 #  gfortran defs 
