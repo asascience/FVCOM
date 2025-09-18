@@ -22,7 +22,6 @@ export HOMEnos=${HOMEnos:-${PACKAGEROOT:?}/nosofs.${nosofs_ver:?}}
 
 set +x
 module use -a $HOMEnos/modulefiles
-#module load wcoss2_prod
 module load intel_x86_64
 set -x
 
@@ -42,13 +41,12 @@ if [ ! -s $LIBnos ]
 then
   mkdir -p $LIBnos
 fi
-set -x
-
-BUILD_JULIAN="YES"
-BUILD_PROJ4="YES"
 
 BUILD_JULIAN="NO"
 BUILD_PROJ4="NO"
+
+#BUILD_JULIAN="YES"
+#BUILD_PROJ4="YES"
 
 if [[ $BUILD_PROJ4 == "YES" ]]; then
   cd $SORCnos/FVCOM.fd/$FVCOM_source/libs/julian
@@ -97,11 +95,6 @@ fi  # BUILD_PROJ4
 cd $SORCnos/FVCOM.fd/$FVCOM_source
 
 models='leofs lmhofs loofs lsofs ngofs2 sfbofs sscofs'
-# models='necofs'
-#models='sfbofs'
-models='leofs lmhofs'
-
-models='lmhofs'
 
 for model in $models
 do
@@ -115,7 +108,7 @@ do
   fi
 done
 
-exit
+gmake clean
 
 #gmake clean
 #gmake -f makefile_necofs
@@ -125,64 +118,4 @@ exit
 #  echo 'necofs fvcom executable is not created'
 #fi
 
-#exit
-
-gmake clean
-gmake -f makefile_NGOFS2
-if [ -s  fvcom_ngofs2 ]; then
-  mv fvcom_ngofs2 $EXECnos/.
-else
-  echo 'fvcom executable is not created'
-fi
-
-gmake clean
-gmake -f makefile_SFBOFS
-if [ -s  fvcom_sfbofs ]; then
-  mv fvcom_sfbofs $EXECnos/.
-else
-  echo 'fvcom executable is not created'
-fi
-
-gmake clean
-gmake -f makefile_LEOFS
-if [ -s  fvcom_leofs ]; then
-  mv fvcom_leofs $EXECnos/.
-else
-  echo 'fvcom executable is not created'
-fi
-
-gmake clean
-gmake -f makefile_LMHOFS
-if [ -s  fvcom_lmhofs ]; then
-  mv fvcom_lmhofs $EXECnos/.
-else
-  echo 'fvcom executable is not created'
-fi
-
-gmake clean
-gmake -f makefile_LOOFS
-if [ -s  fvcom_loofs ]; then
-  mv fvcom_loofs $EXECnos/.
-else
-  echo 'fvcom executable is not created'
-fi
-
-gmake clean
-gmake -f makefile_LSOFS
-if [ -s  fvcom_lsofs ]; then
-  mv fvcom_lsofs $EXECnos/.
-else
-  echo 'fvcom executable is not created'
-fi
-
-cd $SORCnos/FVCOM.fd/$FVCOM_source
-gmake clean
-gmake -f makefile_SSCOFS
-if [ -s  fvcom_sscofs ]; then
-  mv fvcom_sscofs $EXECnos/.
-else
-  echo 'fvcom executable is not created'
-fi
-
-exit
 
