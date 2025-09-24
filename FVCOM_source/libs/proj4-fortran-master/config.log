@@ -29,10 +29,11 @@ uname -v = #1 SMP Fri Jun 27 05:59:19 EDT 2025
 
 PATH: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/gcc-11.2.1/wgrib2-3.1.1-hhe27py2uzzksrpnuywpiezrcukq6frj/bin
 PATH: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/oneapi-2023.1.0/prod-util-2.1.1-ntmzgvxcyzhr6mwvceewqtpdqegpo3cw/bin
-PATH: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/oneapi-2023.1.0/libpng-1.6.39-n3gzlbgf6k3ldkwgan4q25kzpbbissva/bin
 PATH: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/oneapi-2023.1.0/jasper-3.0.3-selqwrc5mjdbxwcoip5kcio4yeligpmi/bin
 PATH: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/oneapi-2023.1.0/libjpeg-turbo-3.0.0-lkbls3mivzctxjiamqwbm4bqnvhlmwsc/bin
 PATH: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/oneapi-2023.1.0/bufr-12.0.1-ywe3auhnrducipyhhyoh7m4pqq5isoyz/bin
+PATH: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/oneapi-2023.1.0/libpng-1.6.39-n3gzlbgf6k3ldkwgan4q25kzpbbissva/bin
+PATH: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/intel-2021.9.0/metis-5.1.0-fdsd6irtc7ukcwpy4ehuwsgxwqd5g33z/bin
 PATH: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/intel-2021.9.0/netcdf-fortran-4.6.1-cpxxwcig5kifogteqpenkxw35q6tthgt/bin
 PATH: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/intel-2021.9.0/netcdf-c-4.9.2-vkckbzk37srvezgw4yt7existfejyque/bin
 PATH: /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/intel-2021.9.0/libaec-1.0.6-hqfpltzb6l6ssyrlh62ykotxw6phdoch/bin

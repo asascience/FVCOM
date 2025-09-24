@@ -1,5 +1,5 @@
 #!/bin/sh
-set -eax
+set -ea
 #HOMEnos=/lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.6.0
 #cd ../..
 #HOMEnos=`pwd`
@@ -20,10 +20,8 @@ export HOMEnos=${HOMEnos:-${PACKAGEROOT:?}/nosofs.${nosofs_ver:?}}
 # TODO: if envvars isn't working within a module, try loading it as a prerequisite in the platform modulefile
 #module load envvar/$envvars_ver
 
-set +x
 module use -a $HOMEnos/modulefiles
 module load intel_x86_64
-set -x
 
 export SORCnos=$HOMEnos/sorc
 export EXECnos=$HOMEnos/exec
@@ -42,13 +40,16 @@ then
   mkdir -p $LIBnos
 fi
 
-BUILD_JULIAN="NO"
-BUILD_PROJ4="NO"
+# BUILD_JULIAN="NO"
+# BUILD_PROJ4="NO"
 
-#BUILD_JULIAN="YES"
-#BUILD_PROJ4="YES"
+BUILD_JULIAN="YES"
+BUILD_PROJ4="YES"
 
-if [[ $BUILD_PROJ4 == "YES" ]]; then
+if [[ $BUILD_JULIAN == "YES" ]]; then
+  echo "Building julian library in $FVCOM_source/libs/julian"
+  echo "-----------------------------------------------------------------------"
+
   cd $SORCnos/FVCOM.fd/$FVCOM_source/libs/julian
   make clean
   make -f makefile
@@ -61,13 +62,18 @@ if [[ $BUILD_PROJ4 == "YES" ]]; then
   rm -f *.o
 fi
 
-if [[ $BUILD_PROJ4 == "YES" ]]; then
-  cd $SORCnos/FVCOM.fd/$FVCOM_source/libs
+#cd $SORCnos/FVCOM.fd/$FVCOM_source/libs
 
+if [[ $BUILD_PROJ4 == "YES" ]]; then
+
+
+  echo "Building proj.4-master in $FVCOM_source/libs/proj.4-master"
+  echo "-----------------------------------------------------------------------"
+  echo "-----------------------------------------------------------------------"
   cd  $SORCnos/FVCOM.fd/$FVCOM_source/libs/proj.4-master
   ./configure CC=$COMP_CC FC=$COMP_F CFLAGS='-DIFORT -g -w -O2'       \
           --prefix=$SORCnos/FVCOM.fd/$FVCOM_source/libs/proj.4-master
-  make clean
+  make clean  # Does not clean
   make
   make install
   if [ -s ./lib/libproj.a ]; then
@@ -76,11 +82,15 @@ if [[ $BUILD_PROJ4 == "YES" ]]; then
     echo "WARNING: ./lib64/libproj.a was not created"
   fi
 
+
+  echo "Building proj4-fortran-master in $FVCOM_source/libs/proj4-fortran-master"
+  echo "-----------------------------------------------------------------------"
+  echo "-----------------------------------------------------------------------"
   cd $SORCnos/FVCOM.fd/$FVCOM_source/libs/proj4-fortran-master
   ./configure CC=$COMP_CC FC=$COMP_F CFLAGS='-DIFORT -g -w -O2'           \
         proj4=$SORCnos/FVCOM.fd/$FVCOM_source/libs/proj.4-master          \
         --prefix=$SORCnos/FVCOM.fd/$FVCOM_source/libs/proj4-fortran-master
-  make clean
+  make clean  # Does not clean
   make
   make install
   if [ -s ./lib/libfproj4.a ]; then
@@ -92,23 +102,29 @@ if [[ $BUILD_PROJ4 == "YES" ]]; then
 fi  # BUILD_PROJ4
 
 
+
+echo "Building the FVCOM models...."
+echo "-----------------------------------------------------------------------"
+
 cd $SORCnos/FVCOM.fd/$FVCOM_source
 
 models='leofs lmhofs loofs lsofs ngofs2 sfbofs sscofs'
 
 for model in $models
 do
+  echo "Building ${model^^} ..."
+  echo "-----------------------------------------------------------------------"
+
   gmake clean
   #Note: model^^ == model upper-case
   gmake -f makefile_${model^^}
   if [ -s  fvcom_${model} ]; then
     mv fvcom_${model} $EXECnos/.
   else
-    echo 'fvcom executable is not created'
+    echo "ERROR: fvcom_${models} executable was not created"
+    exit 1
   fi
 done
-
-gmake clean
 
 #gmake clean
 #gmake -f makefile_necofs
